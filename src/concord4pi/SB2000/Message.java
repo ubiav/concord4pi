@@ -12,6 +12,7 @@ public class Message {
 	private int length = 0;
 	private int command[];
 	private int data[];
+	private int control;
 	private int checksum;
 	
 	private boolean isControlMessage = false;	
@@ -19,7 +20,7 @@ public class Message {
 	//Constructors
 	public Message(int controlChar) {
 		isControlMessage = true;
-		length = controlChar;
+		control = controlChar;
 	}
 	
 	public Message(String asciiMessage)  {
@@ -206,5 +207,10 @@ public class Message {
 	public boolean isControlCommand() {
 		return isControlMessage;
 	}
+	
+	public int getControlChar() {
+		return control;
+	}
+
 }
 

@@ -98,7 +98,7 @@ public class QueueProcessor implements Runnable {
 	private void handleControlMessage(Message currentMessage) {
 		if(ACKQueue.size() > 0) {
 			Message retransmitMessage = ACKQueue.poll();
-			if(currentMessage.getLength() == Constants.ACK) {
+			if(currentMessage.getControlChar() == Constants.ACK) {
 				//must be an ACK
 				retransmitMessage = ACKQueue.poll();
 				LogEngine.Log(Level.FINE, "Received an ACK for " + retransmitMessage.toString(), this.getClass().getName());
@@ -124,7 +124,7 @@ public class QueueProcessor implements Runnable {
 
 	private void handleTxMessage(Message currentMessage) {
 		if(currentMessage.isControlCommand()) {
-			comPort.writeControlChar((byte)currentMessage.getLength());
+			comPort.writeControlChar((byte)currentMessage.getControlChar());
 		}
 		else {
 			comPort.writeMessage(currentMessage.toString());
@@ -146,7 +146,7 @@ public class QueueProcessor implements Runnable {
 			//get the command Handler and run the command Handler
 			commandHandler = commandInterpreter.getClass().getMethod(commandInfo[1], Message.class);
 			logMessage = (String)commandHandler.invoke(commandInterpreter, currentMessage);
-			LogEngine.Log(Level.INFO, "[" + currentMessage + "]" + commandInfo[1] + " " + commandInfo[0] + " " + logMessage, this.getClass().getName());
+			LogEngine.Log(Level.INFO, "[" + currentMessage + "] " + commandInfo[1] + " " + commandInfo[0] + " " + logMessage, this.getClass().getName());
 		} catch (IllegalAccessException | 
 				IllegalArgumentException | 
 				InvocationTargetException | 
