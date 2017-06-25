@@ -6,9 +6,12 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
+import concord4pi.MQTT.MQTTService;
 import concord4pi.SB2000.Constants;
 import concord4pi.SB2000.Message;
 import concord4pi.SB2000.State;
+import concord4pi.logs.LogEngine;
+import concord4pi.serial.SerialInterface;
 
 public class QueueProcessor implements Runnable {
 	
@@ -25,9 +28,12 @@ public class QueueProcessor implements Runnable {
 	
 	private State alarmSystemState;
 	
-	public QueueProcessor(Queue<Message> rx, Queue<Message> tx, Queue<Message> control, 
-			SerialInterface serialObject, 
-			State newState
+	public QueueProcessor(Queue<Message> rx, 
+							Queue<Message> tx, 
+							Queue<Message> control, 
+							SerialInterface serialObject, 
+							State newState,
+							MQTTService MQTT
 	) {
 		alarmSystemState = newState;
 		
@@ -41,7 +47,7 @@ public class QueueProcessor implements Runnable {
 		//automation unit... if we get a NAK, we'll resend.
 		ACKQueue = new  ConcurrentLinkedQueue<Message>();
 		
-		commandInterpreter = new CommandInterpreter(alarmSystemState, txQueue);
+		commandInterpreter = new CommandInterpreter(alarmSystemState, txQueue, MQTT);
 		
 		LogEngine.Log(Level.INFO, "CommandProcessor Loaded", this.getClass().getName());
 	}
@@ -144,8 +150,8 @@ public class QueueProcessor implements Runnable {
 		Method commandHandler;
 		try {
 			//get the command Handler and run the command Handler
-			commandHandler = commandInterpreter.getClass().getMethod(commandInfo[1], Message.class);
-			logMessage = (String)commandHandler.invoke(commandInterpreter, currentMessage);
+			commandHandler = commandInterpreter.getClass().getMethod(commandInfo[1], Message.class, String.class);
+			logMessage = (String)commandHandler.invoke(commandInterpreter, currentMessage, commandInfo[0]);
 			LogEngine.Log(Level.INFO, "[" + currentMessage + "] " + commandInfo[1] + " " + commandInfo[0] + " " + logMessage, this.getClass().getName());
 		} catch (IllegalAccessException | 
 				IllegalArgumentException | 

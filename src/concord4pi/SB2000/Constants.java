@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-import concord4pi.LogEngine;
+import concord4pi.logs.LogEngine;
 
 public class Constants {
 	public final static int MESSAGE_START = 0x0a;
@@ -23,6 +23,7 @@ public class Constants {
 	public final static int ZONESTATUS_TROUBLE = 8;
 	public final static int ZONESTATUS_BYPASSED = 16;
 	
+	public final static String ZONETYPE_NONE = "00";
 	public final static int SOURCETYPE_ZONE = 2;
 	
 	public static final String FullEquipmentListCommand = "020204";

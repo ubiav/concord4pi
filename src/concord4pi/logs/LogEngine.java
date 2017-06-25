@@ -1,11 +1,12 @@
-package concord4pi;
+package concord4pi.logs;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+
+import concord4pi.Config;
 
 public class LogEngine {
 	private static Logger LOG;

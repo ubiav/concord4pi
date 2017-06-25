@@ -3,18 +3,24 @@ package concord4pi;
 import java.util.Queue;
 import java.util.logging.Level;
 
+import concord4pi.MQTT.MQTTService;
 import concord4pi.SB2000.Constants;
 import concord4pi.SB2000.Message;
 import concord4pi.SB2000.State;
+import concord4pi.logs.LogEngine;
 
 public class CommandInterpreter {
 
 	private State alarmSystemState;
 	private Queue<Message> txQueue;
+	private MQTTService MQTTClient;
+	private String MQTTClientID;
 	
-	public CommandInterpreter(State alarmState, Queue<Message> tx) {
+	public CommandInterpreter(State alarmState, Queue<Message> tx, MQTTService MQTT) {
 		alarmSystemState = alarmState;
 		txQueue = tx;
+		MQTTClient = MQTT;
+		MQTTClientID = Config.getProperty("MQTTClientID");
 	}
 	
 	public String[] lookupRxCommand(String rxCommand) {
@@ -85,27 +91,37 @@ public class CommandInterpreter {
 		
 	}
 	
-	public String noOp(Message currentMessage) {
+	public String noOp(Message currentMessage, String actionText) {
+		String MQTTPath = MQTTClientID + "/" + alarmSystemState.getFullID();
+		alarmSystemState.setState(currentMessage.toString(), 0, actionText);
+		MQTTClient.sendMessage(currentMessage.toString(), MQTTPath + "/status");
+		MQTTClient.sendMessage(actionText, MQTTPath + "/statusText");
+
 		return "Ran NoOp";
 	}
 	
-	public String zoneStatus(Message currentMessage) {
+	public String zoneStatus(Message currentMessage, String actionText) {
 		String data = currentMessage.getDataString();
 		String partition = data.substring(0,2);
 		String area = data.substring(2,4);
 		String zone = data.substring(4,8);
 		int zoneStatus = Integer.parseInt(data.substring(8,10), 16);
+		String MQTTPath = MQTTClientID + "/" + alarmSystemState.getZone(partition, area, zone).getFullID();
 		
-		LogEngine.Log(Level.FINE, "Setting Zone State", this.getClass().getName());
-		alarmSystemState.getPartition(partition).getArea(area).getZone(zone).setZoneState(zoneStatus);
+		LogEngine.Log(Level.FINER, "Setting Zone State", this.getClass().getName());
 		
+		alarmSystemState.getZone(partition, area, zone).setState(currentMessage.getCommandString(), zoneStatus);
+		
+		MQTTClient.sendMessage(zoneStatus, MQTTPath + "/status");
+		MQTTClient.sendMessage(alarmSystemState.getZone(partition, area, zone).toString(), MQTTPath + "/json");
+
 		return "Received ZoneStatus [" + Constants.zoneStatusFlags(zoneStatus) + "] " +
-						"in Area [" + area + "] " +
 						"in Partition [" + partition + "] " +
+						"in Area [" + area + "] " +
 						"in Zone [" + zone + "]";		
 	}
 	
-	public String selZoneData(Message currentMessage) {
+	public String selZoneData(Message currentMessage, String actionText) {
 		String data = currentMessage.getDataString();
 		String partition = data.substring(0,2);
 		String area = data.substring(2,4);
@@ -120,6 +136,16 @@ public class CommandInterpreter {
 			zoneTextToken.append(Constants.textTokenName(zoneTextTokens[i]));
 		}
 
+		LogEngine.Log(Level.FINER, "Setting Zone State", this.getClass().getName());
+		
+		alarmSystemState.getZone(partition,area,zone).updateZoneData(
+				currentMessage.getCommandString(), 
+				zoneStatus, 
+				zoneType, 
+				group, 
+				zoneTextToken.toString()
+		);
+		
 		return "Received Zone Data " +
 				"in Partition [" + partition + "] " +
 				"in Area [" + area + "] " +
@@ -130,32 +156,44 @@ public class CommandInterpreter {
 				"ZONE TEXT: [" + zoneTextToken.toString() + "]";		
 	}
 	
-	public String automationEventLost(Message currentMessage) {
+	public String automationEventLost(Message currentMessage, String actionText) {
 		txQueue.add(new Message(Constants.FullEquipmentListCommand));
 		txQueue.add(new Message(Constants.DynamicDataRefreshCommand));
 		return "Received Automation Event Lost - sending Dynamic Data Refresh and Full Equipment List";
 	}
 	
-	public String touchPadDisplay(Message currentMessage) {
+	public String touchPadDisplay(Message currentMessage, String actionText) {
 		String data = currentMessage.getDataString();
 		String partition = data.substring(0,2);
 		String area = data.substring(2,4);
 		String messageType = data.substring(4,6);
 		String textTokens[] = data.substring(6,data.length()).split("(?<=\\G.{2})");
 		StringBuilder textToken = new StringBuilder();
+		String MQTTPath = MQTTClientID + "/" + alarmSystemState.getArea(partition, area).getTouchPad().getFullID();
 		
 		for(int i = 0; i < textTokens.length; i++) {
 			textToken.append(Constants.textTokenName(textTokens[i]));
 		}
 		
+		alarmSystemState.getArea(partition, area).getTouchPad().setState(
+				currentMessage.getCommandString(), 
+				Integer.parseInt(messageType, 16), 
+				textToken.toString()
+		);
+		
+		
+		MQTTClient.sendMessage(Integer.parseInt(messageType, 16), MQTTPath + "/status");
+		MQTTClient.sendMessage(textToken.toString(), MQTTPath + "/statusText");
+		MQTTClient.sendMessage(alarmSystemState.getArea(partition, area).getTouchPad().toString(), MQTTPath + "/json");
+
 		return
 					"Received Touchpad Text Token [" + textToken + "] " +
-							"in Area [" + area + "] " +
 							"in Partition [" + partition + "] " +
+							"in Area [" + area + "] " +
 							"as a " + Constants.messageTypeName(messageType) + " message type ";
 	}
 	
-	public String panelType(Message currentMessage) {
+	public String panelType(Message currentMessage, String actionText) {
 		String data = currentMessage.getDataString();
 		String panelType = data.substring(0,2);
 		String hardwareRevision = data.substring(2, 6);
@@ -169,7 +207,7 @@ public class CommandInterpreter {
 				" and SW Rev 75-" + softwareRevision + " and Serial Number [" + serialNumber + "]";
 	}
 	
-	public String armingLevel(Message currentMessage) {
+	public String armingLevel(Message currentMessage, String actionText) {
 		String data = currentMessage.getDataString();
 		String partition = data.substring(0,2);
 		String area = data.substring(2,4);
@@ -177,27 +215,37 @@ public class CommandInterpreter {
 		String userNumber = data.substring(6,8);
 		int armingLevel = Integer.parseInt(data.substring(8,10));
 		
+		alarmSystemState.getArea(partition, area).setState(
+				currentMessage.getCommandString(), 
+				armingLevel, 
+				Constants.armingLevelName(armingLevel), 
+				alarmSystemState.getArea(partition, area).getUser(userNumber)
+		);
+		
 		return "Received Alarming Level " + Constants.armingLevelName(armingLevel) +
-				" in Area [" + area + "] " +
 				"in Partition [" + partition + "] " +
+				"in Area [" + area + "] " +
 				"for " + Constants.userNumberName(userNumber) + 
 				" [" + userNumber + "] (" + userType + ":" + 
 				Constants.userTypeName(Integer.parseInt(userType,16)) + ")";
 	}
 	
-	public String entryExitDelay(Message currentMessage) {
+	public String entryExitDelay(Message currentMessage, String actionText) {
 		String data = currentMessage.getDataString();
 		String partition = data.substring(0,2);
 		String area = data.substring(2,4);
 		int delayFlags = Integer.parseInt(data.substring(4,6), 16);
 		int delayTime = (Integer.parseInt(data.substring(6,8), 16) << 8) + Integer.parseInt(data.substring(8,10), 16);
+		
+				
+		
 		return "Received Entry/Exit Delay of " + delayTime +
-				" in Area [" + area + "] " +
 				"in Partition [" + partition + "] " +
+				"in Area [" + area + "] " +
 				"with flags [" + Constants.exitEntryDelayFlags(delayFlags) + "]"; 
 	}
 	
-	public String alarmTrouble(Message currentMessage) {
+	public String alarmTrouble(Message currentMessage, String actionText) {
 		String data = currentMessage.getDataString();
 		String partition = data.substring(0,2);
 		String area = data.substring(2,4);
