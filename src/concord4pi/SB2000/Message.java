@@ -3,7 +3,7 @@ package concord4pi.SB2000;
 import java.util.Arrays;
 import java.util.logging.Level;
 
-import concord4pi.LogEngine;
+import concord4pi.logs.LogEngine;
 
 public class Message {
 	private final int MULTIBYTECOMMAND_PREFIX[] = new int[] { 0x22, 0x23 };	

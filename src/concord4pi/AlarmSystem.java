@@ -4,13 +4,20 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
+import concord4pi.API.RESTServer;
+import concord4pi.MQTT.MQTTService;
 import concord4pi.SB2000.*;
+import concord4pi.logs.LogEngine;
+import concord4pi.serial.SerialInterface;
 
 public class AlarmSystem {
 	private QueueProcessor commandProcessor;
 	private Thread cpThread;
 	
 	private State alarmSystemState = new State();
+	
+	private RESTServer API;
+	private MQTTService MQTTClient;
 	
 	private Queue<Message> txQueue = new ConcurrentLinkedQueue<Message>();
 	private Queue<Message> rxQueue = new ConcurrentLinkedQueue<Message>();
@@ -20,7 +27,9 @@ public class AlarmSystem {
 	
 	public AlarmSystem() {
 		setupSerialPort();
-		setupCommandProcessor();		
+		setupRESTAPI();
+		setupMQTTService();
+		setupCommandProcessor(MQTTClient);
 	}
 	
 	public void start() {
@@ -63,6 +72,8 @@ public class AlarmSystem {
 			}
 		}
 		LogEngine.Log(Level.INFO, "Alarm System Automation exiting...", this.getClass().getName());
+		shutdownMQTTService();
+		shutdownRESTAPI();
 	}
 	
 	public void shutdown()  {
@@ -85,10 +96,28 @@ public class AlarmSystem {
 		comPort.closePort();
 	}
 	
-	private void setupCommandProcessor() {
-		commandProcessor = new QueueProcessor(rxQueue, txQueue, controlQueue, comPort, alarmSystemState);
+	private void setupCommandProcessor(MQTTService MQTT) {
+		commandProcessor = new QueueProcessor(rxQueue, txQueue, controlQueue, comPort, alarmSystemState, MQTT);
 		cpThread = new Thread(commandProcessor);
 		cpThread.start();
+	}
+	
+	private void setupRESTAPI() {
+		API = new RESTServer(alarmSystemState);
+		API.start();
+	}
+	
+	private void shutdownRESTAPI() {
+		API.stop();
+	}
+	
+	private void setupMQTTService() {
+		MQTTClient = new MQTTService(Config.getProperty("MQTTConnectionString"), Config.getProperty("MQTTClientID"));
+		MQTTClient.connect();
+	}
+	
+	private void shutdownMQTTService() {
+		MQTTClient.disconnect();
 	}
 	
 	private int scanForMessageStart() {

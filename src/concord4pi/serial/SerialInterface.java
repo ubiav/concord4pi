@@ -1,4 +1,4 @@
-package concord4pi;
+package concord4pi.serial;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -6,7 +6,9 @@ import java.util.logging.Level;
 
 import com.fazecast.jSerialComm.*;
 
+import concord4pi.Config;
 import concord4pi.SB2000.Constants;
+import concord4pi.logs.LogEngine;
 
 public class SerialInterface {
 	SerialPort serialPort;
