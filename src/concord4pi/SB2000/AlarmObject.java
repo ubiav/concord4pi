@@ -2,41 +2,47 @@ package concord4pi.SB2000;
 
 import java.util.Date;
 
+import concord4pi.Config;
+import concord4pi.MQTT.MQTTService;
+
 public class AlarmObject implements IAlarmObject {
 	protected String id;
 
 	protected AlarmObjectStatus currentState;
 	protected AlarmObjectStatus lastState;
 
+	protected boolean sendUpdateOnlyIfChanged = true;
+	
 	private Object parent;
 
 	private AlarmObject next;
 	private AlarmObject previous;
-
+	
+	protected MQTTService MQTTClient;
+	
 	public AlarmObject(Object newParent) {
-		parent = newParent;
-		id = "";
+		this("", newParent);
 	}
 
 	public AlarmObject(String id, Object newParent) {
 		this.id = id;
 		parent = newParent;
+		setMQTTFromParent();
 	}
 
 	@Override
 	public void setState(String action, int state) {
-		lastState = currentState;
-		currentState = new AlarmObjectStatus(action, state, new Date(), "", null);
+		setState(action, state, "", null);
 	}
 
 	public void setState(String action, int state, String description) {
-		lastState = currentState;
-		currentState = new AlarmObjectStatus(action, state, new Date(), description, null);
+		setState(action, state, description, null);
 	}
 
 	public void setState(String action, int state, String description, Object newUser) {
 		lastState = currentState;
 		currentState = new AlarmObjectStatus(action, state, new Date(), description, (User) newUser);
+		sendStandardMQTTMessage();
 	}
 
 	@Override
@@ -195,6 +201,70 @@ public class AlarmObject implements IAlarmObject {
 		return newString.toString();
 	}
 	
+	public void setMQTTService(MQTTService newMQTTClient) {
+		MQTTClient = newMQTTClient;
+	}
+	
+	public MQTTService getMQTTService() {
+		return MQTTClient;
+	}
+	
+	public String getMQTTTopic() {
+		return Config.getProperty(Config.MQTTCLIENTID) + "/" + this.getFullID();
+	}
+	
+	protected void sendStandardMQTTMessage() {
+		if(!sendUpdateOnlyIfChanged || (getLastState() == null)) {
+			if(getCurrentState().getAction() != null) {
+				sendMQTTMessage(getCurrentState().getAction(), "/action");
+			}
+			
+			sendMQTTMessage(getCurrentState().getStatus(), "/status");
+
+			if(getCurrentState().getDescription() != null) {
+				sendMQTTMessage(getCurrentState().getDescription(), "/status/text");
+			}
+			
+			if(getCurrentState().getUser() != null) {
+				sendMQTTMessage(getCurrentState().getUser().getID(), "/user");
+			}
+		}
+		else {
+			
+			if(!getCurrentState().getAction().equals(getLastState().getAction())) { 
+				if(getCurrentState().getAction() != null) {
+					sendMQTTMessage(getCurrentState().getAction(), "/action");
+				}
+			}
+			if(getCurrentState().getStatus() != getLastState().getStatus()) { 
+				sendMQTTMessage(getCurrentState().getStatus(), "/status");
+			}
+			if(!getCurrentState().getDescription().equals(getLastState().getDescription())) { 
+				if(getCurrentState().getDescription() != null) {
+					sendMQTTMessage(getCurrentState().getDescription(), "/status/text");
+				}
+			}
+			
+			if((getCurrentState().getUser() != null) && getLastState().getUser() != null) {
+				if((getCurrentState().getUser().getID() != null) && (getLastState().getUser().getID() != null))
+				{
+					if(!getCurrentState().getUser().getID().equals(getLastState().getUser().getID())) {
+						sendMQTTMessage(getCurrentState().getUser().getID(), "/user");
+					}
+				}
+			}
+			
+		}
+	}
+	
+	protected void sendMQTTMessage(String message, String topicSuffix) {
+		MQTTClient.sendMessage(message, getMQTTTopic() + topicSuffix);
+	}
+
+	protected void sendMQTTMessage(int message, String topicSuffix) {
+		MQTTClient.sendMessage(message, getMQTTTopic() + topicSuffix);
+	}
+	
 	public String getFullID() {
 		return getFullID(this);
 	}
@@ -206,6 +276,12 @@ public class AlarmObject implements IAlarmObject {
 		}
 		else {
 			return getFullID(thisParent) + "/" + searchObject.getClass().getSimpleName().toLowerCase() + searchObject.getID();
+		}
+	}
+	
+	private void setMQTTFromParent() {
+		if(this.parent != null) {
+			MQTTClient = ((AlarmObject)this.parent).getMQTTService();
 		}
 	}
 }

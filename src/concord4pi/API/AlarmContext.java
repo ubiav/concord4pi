@@ -1,41 +1,45 @@
 package concord4pi.API;
 
 import java.io.IOException;
+import java.util.Queue;
+import java.util.logging.Level;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.ContextHandler;
 
+import concord4pi.SB2000.Message;
 import concord4pi.SB2000.State;
+import concord4pi.logs.LogEngine;
 
 
-public class AlarmContext extends ContextHandler {
+public class AlarmContext extends BaseContext {
 
-	private State alarmSystemState;
-	
-	public AlarmContext(String contextPath, State alarmState) {
-		super(contextPath);
-		alarmSystemState = alarmState;
-		this.setContextPath(contextPath);
-		this.setHandler(new RequestHandler());
+	public AlarmContext(String contextPath, State alarmState, Queue<Message> txQueue) {
+		super(contextPath, alarmState, txQueue);
+		this.setHandler(new AlarmRequestHandler());
 	}
 	
-	private class RequestHandler extends AbstractHandler {
+	private class AlarmRequestHandler extends RequestHandler {
 
-		public RequestHandler() {
+		public AlarmRequestHandler() {
 			super();
 		}
 		
-		public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response ) throws IOException, ServletException {
-			response.setContentType("text/html; charset=utf-8");
-			response.setStatus(HttpServletResponse.SC_OK);
-	        response.getWriter().println("{" + alarmSystemState + "}");
-			baseRequest.setHandled(true);
+		@Override
+		public void processGETRequest(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+			try {
+				response.setContentType("text/html; charset=utf-8");
+				response.setStatus(HttpServletResponse.SC_OK);
+		        response.getWriter().println("{" + getAlarmSystemState() + "}");
+				baseRequest.setHandled(true);
+			}
+			catch (IOException e) {
+				LogEngine.Log(Level.WARNING, e.getMessage(), this.getClass().getName());
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				baseRequest.setHandled(true);
+			}
 		}
-
 	}
 }

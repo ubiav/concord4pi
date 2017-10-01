@@ -17,7 +17,8 @@ public class AlarmSystem {
 	private State alarmSystemState = new State();
 	
 	private RESTServer API;
-	private MQTTService MQTTClient;
+	
+	private MQTTService mqtt;
 	
 	private Queue<Message> txQueue = new ConcurrentLinkedQueue<Message>();
 	private Queue<Message> rxQueue = new ConcurrentLinkedQueue<Message>();
@@ -28,8 +29,8 @@ public class AlarmSystem {
 	public AlarmSystem() {
 		setupSerialPort();
 		setupRESTAPI();
-		setupMQTTService();
-		setupCommandProcessor(MQTTClient);
+		setupMQTT();
+		setupCommandProcessor();
 	}
 	
 	public void start() {
@@ -70,10 +71,17 @@ public class AlarmSystem {
 					txQueue.add(new Message(Constants.NAK));
 				}
 			}
+			
+			//a quick sleep to keep the threads from locking the CPU.
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				LogEngine.Log(Level.WARNING, e.getMessage(), this.getClass().getName());
+			}
 		}
 		LogEngine.Log(Level.INFO, "Alarm System Automation exiting...", this.getClass().getName());
-		shutdownMQTTService();
 		shutdownRESTAPI();
+		shutdownMQTT();
 	}
 	
 	public void shutdown()  {
@@ -84,6 +92,7 @@ public class AlarmSystem {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
 		LogEngine.Log(Level.INFO, "Alarm System Automation Stopped.", this.getClass().getName());
 	}
 	
@@ -96,14 +105,14 @@ public class AlarmSystem {
 		comPort.closePort();
 	}
 	
-	private void setupCommandProcessor(MQTTService MQTT) {
-		commandProcessor = new QueueProcessor(rxQueue, txQueue, controlQueue, comPort, alarmSystemState, MQTT);
+	private void setupCommandProcessor() {
+		commandProcessor = new QueueProcessor(rxQueue, txQueue, controlQueue, comPort, alarmSystemState);
 		cpThread = new Thread(commandProcessor);
 		cpThread.start();
 	}
 	
 	private void setupRESTAPI() {
-		API = new RESTServer(alarmSystemState);
+		API = new RESTServer(alarmSystemState, getTxQueue());
 		API.start();
 	}
 	
@@ -111,13 +120,14 @@ public class AlarmSystem {
 		API.stop();
 	}
 	
-	private void setupMQTTService() {
-		MQTTClient = new MQTTService(Config.getProperty("MQTTConnectionString"), Config.getProperty("MQTTClientID"));
-		MQTTClient.connect();
+	private void setupMQTT() {
+		mqtt = new MQTTService(txQueue);
+		mqtt.connect();
+		alarmSystemState.addMQTTService(mqtt);
 	}
 	
-	private void shutdownMQTTService() {
-		MQTTClient.disconnect();
+	private void shutdownMQTT() {
+		mqtt.disconnect();
 	}
 	
 	private int scanForMessageStart() {

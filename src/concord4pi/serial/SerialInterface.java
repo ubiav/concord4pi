@@ -13,7 +13,7 @@ import concord4pi.logs.LogEngine;
 public class SerialInterface {
 	SerialPort serialPort;
 	
-	private String deviceName = Config.getProperty("serialdevice_name");
+	private String deviceName = Config.getProperty(Config.SERIALPORTDEVICE);
 	private int baudRate = 9600;
 	private int dataBits = 8;
 	private int stopBits = SerialPort.ONE_STOP_BIT;

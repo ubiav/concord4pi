@@ -8,7 +8,7 @@ public class User extends AlarmObject {
 	private String userType;
 	private String userTypeName;
 
-	public User(String id, Area newParent) {
+	public User(String id, PartitionArea newParent) {
 		super(id, newParent);
 		LogEngine.Log(Level.FINEST, "Created new User with ID [" + id + "]", this.getClass().getName());
 	}

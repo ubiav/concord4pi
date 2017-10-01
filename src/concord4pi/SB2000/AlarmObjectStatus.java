@@ -1,6 +1,7 @@
 package concord4pi.SB2000;
 
 import java.util.Date;
+import java.util.Hashtable;
 
 public class AlarmObjectStatus {
 	private String action;
@@ -8,9 +9,10 @@ public class AlarmObjectStatus {
 	private Date timestamp;
 	private String description;
 	private User user;
+	private Hashtable<String, String> extendedAttributes;
 	
 	public AlarmObjectStatus() {
-		
+		extendedAttributes = new Hashtable<String, String>();
 	}
 	
 	public AlarmObjectStatus(String newAction, int newStatus, Date newTimestamp, String newDescription, User newUser) {
@@ -19,6 +21,16 @@ public class AlarmObjectStatus {
 		timestamp = newTimestamp;
 		description = newDescription;
 		user = newUser;
+		extendedAttributes = new Hashtable<String, String>();
+	}
+
+	public AlarmObjectStatus(String newAction, int newStatus, Date newTimestamp, String newDescription, User newUser, Hashtable<String, String> newExtendedAttributes) {
+		action = newAction;
+		status = newStatus;
+		timestamp = newTimestamp;
+		description = newDescription;
+		user = newUser;
+		extendedAttributes = newExtendedAttributes;
 	}
 	
 	public int getStatus() {
@@ -39,7 +51,12 @@ public class AlarmObjectStatus {
 	}
 	
 	public String getDescription() {
-		return description;
+		if(description == null) {
+			return "";
+		}
+		else {
+			return description;
+		}
 	}
 	
 	public void setDescription(String newDescription) {
@@ -60,6 +77,14 @@ public class AlarmObjectStatus {
 	
 	public void setAction(String newAction) {
 		action = newAction;
+	}
+	
+	public void setExtendedAttributes(Hashtable<String, String> newExtendedAttributes) {
+		extendedAttributes = newExtendedAttributes;
+	}
+	
+	public Hashtable<String, String> getExtendedAttributes() {
+		return extendedAttributes;
 	}
 	
 	public String toString() {

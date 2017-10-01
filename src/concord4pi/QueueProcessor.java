@@ -6,7 +6,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
-import concord4pi.MQTT.MQTTService;
 import concord4pi.SB2000.Constants;
 import concord4pi.SB2000.Message;
 import concord4pi.SB2000.State;
@@ -32,8 +31,7 @@ public class QueueProcessor implements Runnable {
 							Queue<Message> tx, 
 							Queue<Message> control, 
 							SerialInterface serialObject, 
-							State newState,
-							MQTTService MQTT
+							State newState
 	) {
 		alarmSystemState = newState;
 		
@@ -47,7 +45,7 @@ public class QueueProcessor implements Runnable {
 		//automation unit... if we get a NAK, we'll resend.
 		ACKQueue = new  ConcurrentLinkedQueue<Message>();
 		
-		commandInterpreter = new CommandInterpreter(alarmSystemState, txQueue, MQTT);
+		commandInterpreter = new CommandInterpreter(alarmSystemState, txQueue);
 		
 		LogEngine.Log(Level.INFO, "CommandProcessor Loaded", this.getClass().getName());
 	}
@@ -98,6 +96,14 @@ public class QueueProcessor implements Runnable {
 			} catch (InterruptedException e) {
 				LogEngine.Log(Level.WARNING, "Could not sleep", this.getClass().getName());
 			}
+			
+			//a quick sleep to keep the threads from locking the CPU.
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				LogEngine.Log(Level.WARNING, e.getMessage(), this.getClass().getName());
+			}
+
 		}
 	}
 	
@@ -106,7 +112,6 @@ public class QueueProcessor implements Runnable {
 			Message retransmitMessage = ACKQueue.poll();
 			if(currentMessage.getControlChar() == Constants.ACK) {
 				//must be an ACK
-				retransmitMessage = ACKQueue.poll();
 				LogEngine.Log(Level.FINE, "Received an ACK for " + retransmitMessage.toString(), this.getClass().getName());
 			}
 			else {
@@ -134,7 +139,9 @@ public class QueueProcessor implements Runnable {
 		}
 		else {
 			comPort.writeMessage(currentMessage.toString());
+			LogEngine.Log(Level.INFO, "Wrote the following message to the Automation Module: " + currentMessage, getClass().getName());
 			ACKQueue.add(currentMessage);
+			LogEngine.Log(Level.INFO, "Added Message to ACKQueue: " + currentMessage, getClass().getName());
 		}
 	}
 

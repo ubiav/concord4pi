@@ -8,6 +8,18 @@ import java.util.Properties;
 public class Config {
 	private final static String configFile = "config.properties";
 	
+	public static final String SERIALPORTDEVICE = "SerialDevice";
+	
+	public static final String APIRESTENABLE = "APIRESTEnable";
+	public static final String APIRESTPORT = "APIRestPort";
+	public static final String APICLIENTKEY = "APIClientKey";
+	
+	
+	public static final String MQTTCONNECTIONSTRING = "MQTTConnectionString";
+	public static final String MQTTCLIENTID = "MQTTClientID";
+	public static final String MQTTUSER = "MQTTUsername";
+	public static final String MQTTPASS = "MQTTPassword";	
+	
 	private static Properties prop = new Properties();
 	private InputStream input = null;
 
@@ -40,5 +52,15 @@ public class Config {
 	
 	public static String getFilename() {
 		return configFile;
+	}
+	
+	public static String getMqttCmdTopic() {
+		if(getProperty(MQTTCLIENTID) == null) {
+			return null;
+		}
+		else {
+			return getProperty(MQTTCLIENTID) + "/cmd/#";
+		}
+		
 	}
 }
