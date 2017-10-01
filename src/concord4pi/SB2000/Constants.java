@@ -26,6 +26,98 @@ public class Constants {
 	public final static String ZONETYPE_NONE = "00";
 	public final static int SOURCETYPE_ZONE = 2;
 	
+	public final static int SIREN_SYNC = 5;
+	public final static int SIREN_GO = 6;
+	public final static int SIREN_STOP = 0x0B;
+	public final static int SIREN_OFF = 1;
+	public final static int SIREN_ON = 2;
+	
+	public final static int TEMPERATURE_UNSET = -1;
+	
+	public final static int FEATURESTATE_CHIME = 1;
+	public final static int FEATURESTATE_ENERGYSAVER = 2;
+	public final static int FEATURESTATE_NODELAY = 4;
+	public final static int FEATURESTATE_LATCHKEY = 8;
+	public final static int FEATURESTATE_SILENTARM = 16;
+	public final static int FEATURESTATE_QUICKARM = 32;
+	
+	public final static int KEYFOB_DISARM = 0;
+	public final static int KEYFOB_ARM = 1;
+	public final static int KEYFOB_LIGHTS = 2;
+	public final static int KEYFOB_STAR = 3;
+	public final static int KEYFOB_ARMDISARM = 4;
+	public final static int KEYFOB_LIGHTSTAR = 5;
+	public final static int KEYFOB_LONGLIGHTS = 6;
+	public final static int KEYFOB_ARMSTAR = 9;
+	public final static int KEYFOB_DISARMLIGHTS = 10;
+	
+	public final static String KEYPRESS_0 = "00";
+	public final static String KEYPRESS_1 = "01";
+	public final static String KEYPRESS_2 = "02";
+	public final static String KEYPRESS_3 = "03";
+	public final static String KEYPRESS_4 = "04";
+	public final static String KEYPRESS_5 = "05";
+	public final static String KEYPRESS_6 = "06";
+	public final static String KEYPRESS_7 = "07";
+	public final static String KEYPRESS_8 = "08";
+	public final static String KEYPRESS_9 = "09";
+	public final static String KEYPRESS_STAR = "0A";
+	public final static String KEYPRESS_POUND = "0B";
+	public final static String KEYPRESS_POLICEPANIC = "0C";
+	public final static String KEYPRESS_AUXPANIC = "0D";
+	public final static String KEYPRESS_FIREPANIC = "0E";
+	public final static String KEYPRESS_LIGHTSON = "10";
+	public final static String KEYPRESS_LIGHTSOFF = "11";
+	public final static String KEYPRESS_LIGHTSTOGGLE = "12";
+	public final static String KEYPRESS_KEYSWITCHON = "13";
+	public final static String KEYPRESS_KEYSWITCHOFF = "14";
+	public final static String KEYPRESS_KEYSWITCHTOGGLE = "15";
+	public final static String KEYPRESS_FIRETPACKNOWLEDGE = "1C";
+	public final static String KEYPRESS_FIRETPSILENCE = "1D";
+	public final static String KEYPRESS_FIRETPFIRETEST = "1E";
+	public final static String KEYPRESS_FIRETPSMOKERESET = "1F";
+	public final static String KEYPRESS_KEYFOBDISARM = "20";
+	public final static String KEYPRESS_KEYFOBARM = "21";
+	public final static String KEYPRESS_KEYFOBLIGHTS = "22";
+	public final static String KEYPRESS_KEYFOBSTAR = "23";
+	public final static String KEYPRESS_KEYFOBARMDISARM = "24";
+	public final static String KEYPRESS_KEYFOBLIGHTSSTAR = "25";
+	public final static String KEYPRESS_KEYFOBLONGLIGHTS = "26";
+	public final static String KEYPRESS_KEYFOBDIRECTARMTOLEVEL3 = "27";
+	public final static String KEYPRESS_KEYFOBDIRECTARMTOLEVEL2 = "28";
+	public final static String KEYPRESS_KEYFOBARMSTAR = "29";
+	public final static String KEYPRESS_KEYFOBDISARMLIGHTS = "2A";
+	public final static String KEYPRESS_TPA = "2C";
+	public final static String KEYPRESS_TPB = "30";
+	public final static String KEYPRESS_TPC = "2D";
+	public final static String KEYPRESS_TPD = "33";
+	public final static String KEYPRESS_TPE = "2E";
+	public final static String KEYPRESS_TPF = "36";
+
+	public final static String MESSAGECOMMAND_PANELTYPE = "01";
+	public final static String MESSAGECOMMAND_AUTOMATIONEVENTLOST = "02";
+	public final static String MESSAGECOMMAND_SELZONE = "03";
+	public final static String MESSAGECOMMAND_SELPARTITION = "04";
+	public final static String MESSAGECOMMAND_SELSUPERBUSDEVICE = "05";
+	public final static String MESSAGECOMMAND_CADI = "20";
+	public final static String MESSAGECOMMAND_ZONESTATUS = "21";
+	public final static String MESSAGECOMMAND_ARMINGLEVEL = "2201";
+	public final static String MESSAGECOMMAND_ALARMTROUBLE = "2202";
+	public final static String MESSAGECOMMAND_ENTRYEXITDELAY = "2203";
+	public final static String MESSAGECOMMAND_SIRENSETUP = "2204";
+	public final static String MESSAGECOMMAND_SIRENSYNC = "2205";
+	public final static String MESSAGECOMMAND_SIRENGO = "2206";
+	public final static String MESSAGECOMMAND_TOUCHPADDISPLAY = "2209";
+	public final static String MESSAGECOMMAND_SIRENSTOP = "220B";
+	public final static String MESSAGECOMMAND_FEATURESTATE = "220C";
+	public final static String MESSAGECOMMAND_TEMPERATURE = "220D";
+	public final static String MESSAGECOMMAND_TIMEDATE = "220E";
+	public final static String MESSAGECOMMAND_LIGHTSSTATE = "2301";
+	public final static String MESSAGECOMMAND_USERLIGHTS = "2302";
+	public final static String MESSAGECOMMAND_KEYFOB = "2303";
+	public final static String MESSAGECOMMAND_KEYPRESS = "40";
+
+	
 	public static final String FullEquipmentListCommand = "020204";
 	public static final String DynamicDataRefreshCommand = "022022";
 
@@ -1243,5 +1335,7 @@ public class Constants {
 		}
 		return getEventSpecificName;
 	}
+	
+	
 	
 }

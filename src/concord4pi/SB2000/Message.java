@@ -95,8 +95,7 @@ public class Message {
 		int[] binaryArray = new int[stringArray.length];
 
 		for(int i = 0; i < stringArray.length; i++) {
-			
-			binaryArray[i] = convertHexToBinary(stringArray[i]);	
+			binaryArray[i] = convertHexToBinary(stringArray[i]);
 		}
 
 		return binaryArray;
