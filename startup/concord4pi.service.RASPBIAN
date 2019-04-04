@@ -1,0 +1,16 @@
+[Unit]
+Description=concord4pi Automation Service
+After=network.target
+
+[Service]
+Type=simple
+
+User=pi
+
+StandardOutput=null
+StandardError=null
+ExecStart=/opt/concord4pi/start.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

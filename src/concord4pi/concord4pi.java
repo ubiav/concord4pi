@@ -1,11 +1,11 @@
 package concord4pi;
 
-import concord4pi.logs.LogEngine;
+import concord4pi.config.*;
+import concord4pi.logging.*;
 
 public class concord4pi {
-	AlarmSystem alarmSystem;
-	Config configuration;
-	LogEngine LOG;
+
+	private MainController masterControl;
 	
 	public static void main(String[] args) {
 		concord4pi program = new concord4pi();
@@ -13,14 +13,27 @@ public class concord4pi {
 	}
 
 	public concord4pi() {
-		LOG = new LogEngine();
-		configuration = new Config();
-		alarmSystem = new AlarmSystem();
+		Config appConfiguration;
+		LogEngine logger;
+		
+		//Get the application config & verify
+		appConfiguration = new Config();
+		if(!appConfiguration.valid()) {
+			System.out.println("The config file could not be found or is not configured correctly.");
+			System.out.println("Please fix your config file (./concord4pi.config) and retry.");
+			System.exit(0);
+		}
+		else {	
+			//Set up the Logger
+			logger = new LogEngine(appConfiguration);
+			masterControl = new MainController(appConfiguration, logger);
+		}
 	}
 	
 	public void go() {
-		alarmSystem.start();
-		alarmSystem.shutdown();
+		masterControl.start();
+		masterControl.shutdown();
 	}
+	
 	
 }
