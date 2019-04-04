@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#This creates a pseudo serial port to test communication with the automation module
+
+ROOTPATH=./
+INPUTFILE=SERIALIN
+OUTPUTFILE=SERIALOUT
+BAUD=9600
+DATA=8
+STOP=1
+PARITY=1
+
+
+socat PTY,link=${ROOTPATH}/${INPUTFILE},ispeed=${BAUD},ospeed=${BAUD},parenb=1,parodd=1,cs8,echo=0,raw PTY,link=${ROOTPATH}/${OUTPUTFILE},ispeed=${BAUD},ospeed=${BAUD},parenb=1,parodd=1,cs8,echo=0,raw

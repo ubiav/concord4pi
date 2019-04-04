@@ -1,14 +1,19 @@
 # concord4pi
 A java-based integration for interacting with a Concord Alarm System (SuperBus 2000 Automation Module)
 
-This is the basic working code with a lot of work to add for usability (e.g. easy start, automated builds, etc.)  but for now, it will be good enough to share the code.
+Version: 0.2
 
-If you do the following, you should be able to run the code:
+Code Changes
 
-1) Make a JAR out of everything in the "src" directory.
-2) Download the jSerialComm.jar file from http://fazecast.github.io/jSerialComm/ or the lib directory in GITHUB
-3) Download the Jetty JAR file see lib directory)
-4) Download the PAHO Client JAR file (see lib directory)
-5) Edit the config.properties to have the right settings for your set up. 
-6) Start the program via: 
-      java -Djava.util.logging.SimpleFormatter.format="%1\$tY-%1\$tm-%1\$td %1\$tH:%1\$tM:%1\$tS %4\$-6s %5\$s%6\$s%n" -cp lib/jSerialComm-1.3.11.jar:lib/jetty-all-9.4.5.v20170502-uber.jar:concord4pi.jar:lib/org.eclipse.paho.client.mqttv3-1.1.1.jar concord4pi.concord4pi
+This is a complete re-write of the concord4pi interface bridge from the SuperBus2000 Automation Module to an IP Network.  Key changes from previous versions include:
+ - Event-based actions for handling data from the serial port and sending messages through MQTT
+ - Simplified / cleaned data structure for in-memory alarm state; state is built dynamically as messages are received from the automation module.
+ - Simplified message processing for incoming serial data
+ - Extensible interface to support additional outgoing message updates (e.g. can re-add the REST API easily, if needed)
+ - MQTT topic structure simplified and allows improved discoverability
+
+Requirements
+
+This software requires an computer attached to the SB2000 via serial interface with network connectivity to an IPv4 network.  This has been tested on:
+ - Raspberry Pi Zero W (should function on all other Raspberry Pi devices)
+ - RS232 Serial to TTL Converter Board (hardwired to RPI Zero W GPIO serial pins)
