@@ -7,8 +7,8 @@ public class concord4pi {
 
 	private MainController masterControl;
 	
-	public static void main(String[] args) {
-		concord4pi program = new concord4pi();
+	public static void main(final String[] args) {
+		final concord4pi program = new concord4pi();
 		program.go();
 	}
 

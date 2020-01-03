@@ -90,11 +90,11 @@ public class MQTTService implements Runnable, IBroadcaster {
 			MqttConnectOptions connectionOptions = new MqttConnectOptions();
 			connectionOptions.setAutomaticReconnect(true);
 			
-			if(!username.isEmpty()) {
+			if((username != null) && (!username.isEmpty())) {
 				connectionOptions.setUserName(username);
 			}
 			
-			if(!password.isEmpty()) {
+			if((password != null) && (!password.isEmpty())) {
 				connectionOptions.setPassword(password.toCharArray());
 			}
 

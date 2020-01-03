@@ -145,11 +145,19 @@ public class SB2000Controller implements Runnable {
 					if(dataProcessorString.length() > 2) {
 						//there is enough room to check for a message length
 						//add one to include the checksum byte
-						int length = Integer.parseInt(dataProcessorString.substring(0,2), 16) + 1;
-	
+						int length = 0;
+						try {
+							//Try to parse the message.  Ignore and discard it if exception occurs
+							length = Integer.parseInt(dataProcessorString.substring(0,2), 16) + 1;
+						}
+						catch (Exception e) {
+							logger.log("Could not determine message length from message.  This shouldn't be the case.  Ignoring message... ", Level.WARN);
+							length = -1;
+						}
+						
 						//check if there is a full message according to the expected length
 						//multiply by 2 since each number is represented by two ASCII characters
-						if(dataProcessorString.length() >= (length * 2)) {
+						if((length > 0) && (dataProcessorString.length() >= (length * 2))) {
 							String newMessageText = dataProcessorString.substring(0, (length * 2)).trim();
 							logger.log("Discovered new message [" + newMessageText + "]", Level.DEBUG);
 							
@@ -197,6 +205,7 @@ public class SB2000Controller implements Runnable {
 								return;
 							}
 						}
+
 					}
 					else {
 						dataToProcess = new String(new byte[] {SB2000Constants.MESSAGE_START}) + dataProcessorString;

@@ -1,0 +1,7 @@
+.vscode
+bin
+debug/SERIALIN
+debug/SERIALOUT
+logs
+.classpath
+.project

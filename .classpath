@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="jars/concord4pi.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-all-9.4.5.v20170502-uber.jar"/>
+	<classpathentry kind="lib" path="lib/jSerialComm-2.4.2.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.paho.client.mqttv3-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/tinylog-api-2.0.0-M2.1.jar"/>
+	<classpathentry kind="lib" path="lib/tinylog-impl-2.0.0-M2.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
