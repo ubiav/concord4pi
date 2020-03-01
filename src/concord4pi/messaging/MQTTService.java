@@ -219,9 +219,11 @@ public class MQTTService implements Runnable, IBroadcaster {
 			//it will be the same for every message so removing to make it easier.
 			String shortTopic = topic.replace(topicBase + "/" + listenTopic, "");
 			
-			if(shortTopic.isEmpty()) {
+			logger.log("The shortTopic is |" + shortTopic + "|", Level.DEBUG);
+			
+			if(shortTopic.isBlank()) {
 				//the message was just broadcast in the base topic... handle as a command.
-				logger.log("Received MQTT Message on base topic... treating as raw command", Level.TRACE);
+				logger.log("Received MQTT Message on base topic... treating as raw command", Level.DEBUG);
 				IOMessage newMessage = new IOMessage(message.getBytes());
 				if(newMessage.isValid()) {
 					returnMessages.offer(newMessage);

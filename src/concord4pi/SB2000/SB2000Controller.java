@@ -55,6 +55,7 @@ public class SB2000Controller implements Runnable {
 	}
 	
 	public void sendMessage(IOMessage newMessage) {
+		logger.log("Adding message [" + newMessage + "] to TXQueue", Level.TRACE);
 		txQueue.offer(newMessage);
 	}
 	
