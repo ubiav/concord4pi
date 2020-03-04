@@ -18,4 +18,8 @@ public class NotificationPacket {
 		this.value = value;
 		this.action = action;
 	}
+	
+	public String toString() {
+		return key + "|" + value + "|" + action;
+	}
 }

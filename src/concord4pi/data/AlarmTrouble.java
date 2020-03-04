@@ -402,8 +402,7 @@ public class AlarmTrouble implements IAlarmObject {
 
 	@Override
 	public String myAddress() {
-		// TODO Auto-generated method stub
-		return null;
+		return parent.myAddress() + "/event";
 	}
 
 	@Override

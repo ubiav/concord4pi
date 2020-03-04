@@ -122,6 +122,8 @@ public class AlarmAreaPartition implements IAlarmObject {
 		AlarmTrouble newEvent = new AlarmTrouble(this, logger, generalType, specificType, sourceType, sourceNumber, eventData); 
 		alarmTroubleEvents.add(newEvent);
 		
+		//when the linked list hits its max,remove the oldest.
+		//this provides some history but limits the length of the list
 		while(alarmTroubleEvents.size() > maxMessageHistory) {
 			alarmTroubleEvents.remove(alarmTroubleEvents.get(alarmTroubleEvents.size()-1));
 		}
