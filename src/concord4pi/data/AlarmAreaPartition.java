@@ -161,7 +161,7 @@ public class AlarmAreaPartition implements IAlarmObject {
 
 	@Override
 	public String myAddress() {
-		return parent.myAddress() + "/areapartition/" + ID;
+		return parent.myAddress() + "/partitionarea/" + ID;
 	}	
 	
 	@Override

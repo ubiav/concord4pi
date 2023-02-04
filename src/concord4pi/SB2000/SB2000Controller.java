@@ -43,6 +43,12 @@ public class SB2000Controller implements Runnable {
 			
 			//then process anything that is incoming
 			processIncomingMessages();
+
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

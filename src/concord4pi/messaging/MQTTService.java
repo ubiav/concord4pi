@@ -78,6 +78,12 @@ public class MQTTService implements Runnable, IBroadcaster {
 				sendMessage(packet);
 			}
 
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
 		}
 		
 		stopListening();		
