@@ -11,6 +11,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
+import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.tinylog.Level;
 
 import concord4pi.SB2000.IOMessage;
@@ -31,7 +32,7 @@ public class MQTTService implements Runnable, IBroadcaster {
 	
 	private boolean isRunning = false;
 	
-	private final boolean retainMessages = true;
+	private final boolean retainMessages = false;
 	
 	public MQTTService(LogEngine logger, String connectionString, String clientID, String username, String password, String topicBase, String listenTopic, boolean enableCommands) {
 		this.logger = logger;
@@ -44,8 +45,9 @@ public class MQTTService implements Runnable, IBroadcaster {
 		try {
 			clientConnection = new MqttClient(
 					connectionString, 
-					clientID
-					);	
+					clientID,
+					new MqttDefaultFilePersistence("/tmp/concord4pi")
+			);	
 			logger.log("Created MQTT Service connection", Level.DEBUG);
 			isRunning = connect();
 			startListening();

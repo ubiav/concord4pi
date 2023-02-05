@@ -171,13 +171,14 @@ public class SB2000Controller implements Runnable {
 							IOMessage newMessage = new IOMessage(newMessageText.getBytes());
 							
 							if(newMessage.isValid()) {
+								logger.log("Received valid message [" + newMessageText + "]", Level.DEBUG);
 								rxQueue.offer(newMessage);
 								txQueue.offer(new ControlMessage(SB2000Constants.ACK));
-								logger.log("Received valid message [" + newMessageText + "]", Level.DEBUG);
+								
 							}
 							else {
-								txQueue.offer(new ControlMessage(SB2000Constants.NAK));
 								logger.log("Received invalid message [" + newMessageText + "]", Level.DEBUG	);
+								txQueue.offer(new ControlMessage(SB2000Constants.NAK));
 							}
 							
 							//erase the message from the one I just pulled out

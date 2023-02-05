@@ -35,17 +35,17 @@ public class AlarmSystemData implements IAlarmObject {
 	public AlarmAreaPartition getAreaPartitionByID(String ID) {
 		ListIterator<AlarmAreaPartition> apList = areaPartitions.listIterator();
 		
-		logger.log("Looking for AreaPartition by ID " + ID, Level.TRACE);
+		logger.log("Looking for PartitionArea by ID " + ID, Level.TRACE);
 		
 		while(apList.hasNext()) {
 			AlarmAreaPartition theAP = apList.next();
 			if(theAP.getID().equals(ID)) {
-				logger.log("Found AreaPartition " + ID, Level.TRACE);
+				logger.log("Found PartitionArea " + ID, Level.TRACE);
 				return theAP;
 			}
 		}
 		
-		logger.log("AreaPartition " + ID + " not found! Adding new partition of ID: " + ID, Level.TRACE);
+		logger.log("PartitionArea " + ID + " not found! Adding new partition of ID: " + ID, Level.TRACE);
 		return addAreaPartitionByID(ID);
 	}
 	
@@ -64,7 +64,7 @@ public class AlarmSystemData implements IAlarmObject {
 		
 		while(apList.hasNext()) {
 			AlarmAreaPartition theAP = apList.next();
-			logger.log("Sending Siren Sync to AreaPartition [" + theAP.getID() + "]", Level.TRACE);
+			logger.log("Sending Siren Sync to PartitionArea [" + theAP.getID() + "]", Level.TRACE);
 			theAP.getSiren().addSyncEvent();
 		}
 	}
@@ -74,7 +74,7 @@ public class AlarmSystemData implements IAlarmObject {
 		
 		while(apList.hasNext()) {
 			AlarmAreaPartition theAP = apList.next();
-			logger.log("Sending Siren Signal [" + go + "] to AreaPartition [" + theAP.getID() + "]", Level.TRACE);
+			logger.log("Sending Siren Signal [" + go + "] to PartitionArea [" + theAP.getID() + "]", Level.TRACE);
 			if(go) { theAP.getSiren().goSiren(); }
 			else { theAP.getSiren().stopSiren(); }
 		}
