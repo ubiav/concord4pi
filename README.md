@@ -5,6 +5,18 @@ Version: 0.3
 
 Code Changes
 
+The following changes were made:
+ - Disabled MQTT client persistence.  This caused slowness and re-transmission that isn't necessary.  A new message from the SB2000 Controller will come quickly enough and will overwrite the existing value.  Guaranteeing delivery to the MQTT service provides more issues than it is worth.
+ - Moved MQTT file persistence caching directory to /tmp/concord4pi.  As /tmp is generally a memdisk, this also speeds up the communication.
+ - ISSUE #8 High CPU Utilization: Added sleep statements to allow the thread loops to pass control back to any other processes that need it.
+ - ISSUE #7 Text Order Problem: Changed references of "areapartition" or "AreaPartition" to "partitionarea" or "PartitionArea" (respectively) to align with the order of the numerical value in the MQTT topics
+
+----
+
+Version: 0.2
+
+Code Changes
+
 This is a complete re-write of the concord4pi interface bridge from the SuperBus2000 Automation Module to an IP Network.  Key changes from previous versions include:
  - Event-based actions for handling data from the serial port and sending messages through MQTT
  - Simplified / cleaned data structure for in-memory alarm state; state is built dynamically as messages are received from the automation module.
